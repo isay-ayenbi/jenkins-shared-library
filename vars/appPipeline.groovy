@@ -35,14 +35,11 @@ def call(Map pipelineParams) {
                             echo 'JOB_URL '+JOB_URL
                         }
                     }
-                    stage('Deploy pos-client') {
-                        when {
-                            expression { env.GIT_URL.contains('kjt-pos-callctr-client') }
-                        }
-                        steps {
-                            echo 'Deploying pos-client'
-                            deploy("callcenter", "kjt-pos-client", env.INT_PH_IP, env.BUILD_NUMBER, 'int', env.BRANCH_NAME)
-                        }
+                }
+                post {
+                    always {
+                        echo "Deploying ${pipelineParams.project}"
+                        deploy(pipelineParams.type, pipelineParams.project, env.INT_PH_IP, env.BUILD_NUMBER, 'int', env.BRANCH_NAME)
                     }
                 }
             }
