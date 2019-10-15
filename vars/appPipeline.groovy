@@ -13,7 +13,7 @@ def call(Map pipelineParams) {
         stages {
             stage('archive') {
                 steps {
-                    archiveArtifacts 'WebContent/**'
+                    archiveArtifacts pipelineParams.archive
                 }
             }
             stage('Deploy to INT-PH') {
@@ -35,6 +35,16 @@ def call(Map pipelineParams) {
                             echo 'JOB_URL '+JOB_URL
                         }
                     }
+                    stage('Build core') {
+                        when {
+                            // expression { env.GIT_URL.contains('kjt-pos-callctr-client') }
+                            equals expected: 'kjt-pos-core', actual: pipelineParams.project
+                        }
+                        steps {
+                            echo "Building ${pipelineParams.project}"
+                            maven clean compile war:war     
+                        }
+                    } 
                 }
                 post {
                     always {
